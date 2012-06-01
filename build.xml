@@ -1,0 +1,67 @@
+<project name="SmartRunner" default="run-spec" basedir=".">
+
+	<property name="src.dir" value="${basedir}/src/java" />
+	<property name="build.dir" value="${basedir}/build" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="manifest" value="${build.dir}/MANIFEST.MF" />
+
+	<property name="runner_jar" location="${build.dir}/${ant.project.name}.jar" />
+
+	<path id="rhino_jar">
+		<pathelement location="${basedir}/lib/js_rhino_1_7R3.jar" />
+	</path>
+
+	<target name="clean">
+		<echo>===============================</echo>
+		<echo>${ant.project.name}: clean     </echo>
+		<echo>===============================</echo>
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="init">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${classes.dir}" />
+	</target>
+
+	<target name="complie" depends="init">
+		<echo>===============================</echo>
+		<echo>${ant.project.name}: compile   </echo>
+		<echo>===============================</echo>
+		<javac destdir="${classes.dir}" includeantruntime="false" debug="on" encoding="UTF-8">
+			<src path="${src.dir}" />
+			<classpath refid="rhino_jar" />
+		</javac>
+		<copy todir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<exclude name="**/*.java" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="jar" depends="complie">
+		<echo>===============================</echo>
+		<echo>${ant.project.name}: jar	     </echo>
+		<echo>===============================</echo>
+		<echo file="${manifest}">Main-Class: smart.SpecRunner
+Class-Path: ../lib/js_rhino_1_7R3.jar</echo>
+		<jar destfile="${build.dir}/${ant.project.name}.jar" manifest="${manifest}" duplicate="preserve">
+			<fileset dir="${classes.dir}" />
+		</jar>
+	</target>
+
+	<target name="run-spec" depends="jar">
+		<echo>===============================</echo>
+		<echo>${ant.project.name}: run-spec  </echo>
+		<echo>===============================</echo>
+		<java fork="true" jar="${runner_jar}" failonerror="true">
+			<arg value="js/Song.js" />
+			<arg value="js/Player.js" />
+			<arg value="spec/SpecHelper.js" />
+			<arg value="spec/PlayerSpec.js" />
+			<jvmarg value="-Dfile.encoding=utf-8" />
+			<jvmarg value="-Xmx512m" />
+		</java>
+		<echo message="" />
+	</target>
+
+</project>
