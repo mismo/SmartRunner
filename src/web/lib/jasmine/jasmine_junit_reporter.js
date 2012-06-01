@@ -25,14 +25,14 @@
 	}
 
 	function elapsed(startTime, endTime) {
-		return (endTime - startTime) / 1000;
+		return ((endTime - startTime) / 1000) || 0;
 	}
 
 	function toISODateString(d) {
 		function pad(n) {
 			return n < 10 ? '0' + n : n;
 		}
-
+		d = d || (new Date());
 		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T'
 				+ pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
 	}
@@ -112,7 +112,7 @@
 		reportSuiteResults : function(suite) {
 			var endTime = new Date(), results = suite.results(), desc = suite.description;
 			var suiteReport = {
-				name : desc,
+				name : (desc || '').replace(/&/g, '&amp;'),
 				errors : 0,
 				tests : results.totalCount,
 				failures : results.failedCount,
@@ -125,8 +125,8 @@
 			for (i = 0, len = specs.length; i < len; i++) {
 				spec = specs[i];
 				testcase = {
-					classname : desc,
-					name : spec.description,
+					classname : suiteReport.name,
+					name : (spec.description || '').replace(/&/g, '&amp;'),
 					time : elapsed(spec.startTime, spec.endTime),
 					failure : null
 				};
