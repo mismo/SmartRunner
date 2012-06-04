@@ -1,9 +1,11 @@
 <project name="SmartRunner" default="run-spec" basedir=".">
 
-	<property name="src.dir" value="${basedir}/src/java" />
+	<property name="src.java.dir" value="${basedir}/src/java" />
+	<property name="src.web.dir" value="${basedir}/src/web" />
 	<property name="build.dir" value="${basedir}/build" />
 	<property name="classes.dir" value="${build.dir}/classes" />
 	<property name="manifest" value="${build.dir}/MANIFEST.MF" />
+	<property name="phantomjs.dir" value="${basedir}/phantomjs" />
 
 	<property name="runner_jar" location="${build.dir}/${ant.project.name}.jar" />
 
@@ -28,11 +30,11 @@
 		<echo>${ant.project.name}: compile   </echo>
 		<echo>===============================</echo>
 		<javac destdir="${classes.dir}" includeantruntime="false" debug="on" encoding="UTF-8">
-			<src path="${src.dir}" />
+			<src path="${src.java.dir}" />
 			<classpath refid="rhino_jar" />
 		</javac>
 		<copy todir="${classes.dir}">
-			<fileset dir="${src.dir}">
+			<fileset dir="${src.java.dir}">
 				<exclude name="**/*.java" />
 			</fileset>
 		</copy>
@@ -61,6 +63,16 @@ Class-Path: ../lib/js_rhino_1_7R3.jar</echo>
 			<jvmarg value="-Dfile.encoding=utf-8" />
 			<jvmarg value="-Xmx512m" />
 		</java>
+		<echo message="" />
+	</target>
+
+	<target name="run-with-phantomjs">
+		<echo>==========================================</echo>
+		<echo>${ant.project.name}: run-with-phantomjs   </echo>
+		<echo>==========================================</echo>
+		<exec executable="cmd" failonerror="true" dir="${src.web.dir}">
+			<arg line="/c ${phantomjs.dir}/phantomjs.exe ${phantomjs.dir}/run-jasmine.js SpecRunner.html" />
+		</exec>
 		<echo message="" />
 	</target>
 
